@@ -1,0 +1,22 @@
+{% extends 'main/base.html' %}
+{% block title %}
+{{ title }}
+{% endblock %}
+
+{% block content%}
+<h1>Каталог товара</h1>
+    {% if catalog_list %}
+        {% for product in catalog_list %}
+            <div class="product">
+                <h4>{{ product.name }}</h2>
+                <p>{{ product.description }}</p>
+                <p>{{ product.price }}</p>
+                <p>{{ product.category }}</p>
+                <img src="{{ product.image }}">
+            </div>
+        {% endfor %}
+    {% else %}
+        <p>Товары отсуствуют</p>
+    {% endif %}
+{% endblock %}
+

@@ -1,0 +1,25 @@
+{% extends 'main/base.html' %}
+{% block title %}
+Создать товар
+{% endblock %}
+
+{% block content%}
+<h1>Создать товар</h1>
+<form method="post">
+    {% csrf_token %}
+    {{ form.name }}<br>
+    {{ form.description }}<br>
+    {{ form.sex }}<br>
+    {{ form.size }}<br>
+    {{ form.price }}<br>
+    {{ form.image }}<br>  
+{% comment %}     <input type="text" placeholder="Введдите название товара" class="form-control"><br>
+    <textarea placeholder="Введите описание товара" class="form-control"></textarea><br>
+    <input type="text" placeholder="Введите пол" class="form-control"><br>
+    <input type="text" placeholder="Введите размер товара" class="form-control"><br>
+    <input type="text" placeholder="Введите цену товара" class="form-control"><br>
+    <input type="file" name="photo" multiple accept="image/*,image/jpeg" class="form-control"><br>  {% endcomment %}
+    <button type="submit" class="btn btn-success">Создать</button>
+    <span>{{error}}</span>
+</form>
+{% endblock %}
