@@ -4,9 +4,16 @@
 {% endblock %}
 
 {% block content%}
-<form method="post" action"">
+{% if form.errors %}
+<div class="alert alert-danger" role="alert">
+    {{ form.errors }}
+</div>
+{% endif %}
+<div class="shadow p-4 mb-5 bg-body rounded">
+<form method="post" action"{% url "register" %}">
     {% csrf_token %}
     {{ form.as_p }}
     <input type="submit" value="Зарегистрироваться" class="btn btn-success">
 </form>
+</div>
 {% endblock %}

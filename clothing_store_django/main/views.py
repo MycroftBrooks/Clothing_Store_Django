@@ -6,7 +6,7 @@ from django.shortcuts import redirect, render
 from django.urls import reverse_lazy
 from django.views.generic.edit import CreateView
 
-from .forms import catalogForm
+from .forms import catalogForm, RegisterUserFrom
 from .models import catalog
 
 
@@ -31,15 +31,22 @@ def create(request):
             submitted = True
     return render(request, 'main/create.html', {'form': form, 'submitted': submitted})
 
-class RegisterFormView(CreateView):
-    form_class = UserCreationForm
-    template_name = "main/register.html"
-    success_url = reverse_lazy('index')
-    def form_valid(self, form):
-        form.save()
-        return super(RegisterFormView, self).form_valid(form)
-    def form_invalid(self, form):
-        return super(RegisterFormView, self).form_invalid(form)
+def register_user(request):
+    if request.method == 'POST':
+        form = RegisterUserFrom(request.POST)
+        if form.is_valid():
+            form.save()
+            username = form.cleaned_data.get('username')
+            password = form.cleaned_data.get('password1')
+            user = authenticate(username=username, password=password)
+            login(request, user)
+            messages.success(request, ('Вы зарегистрировались как ' + username))
+            return redirect('index')
+    else:
+        form = RegisterUserFrom()
+    return render(request, 'main/register.html', {
+        'form': form
+    })
 
 def login_user(request):
     if request.method == "POST":
