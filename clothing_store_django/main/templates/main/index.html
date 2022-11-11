@@ -12,11 +12,12 @@
                 <p>{{ product.description }}</p>
                 <p>{{ product.price }}</p>
                 <p>{{ product.category }}</p>
-                <img src="{{ product.image }}">
+                {% load static %}
+                <img src="{{product.image}}">
             </div>
         {% endfor %}
     {% else %}
-        <p>Товары отсуствуют</p>
+        <center><p>Товары отсуствуют</p></center>
     {% endif %}
 {% endblock %}
 

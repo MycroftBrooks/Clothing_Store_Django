@@ -4,15 +4,16 @@
 {% endblock %}
 
 {% block content%}
-<h1>Создать товар</h1>
-<form method="post">
+<center><h1>Создать товар</h1></center>
+{% if submitted %}
+    <div class="alert alert-success" role="alert">
+        Товар успешно создан!
+    </div>
+{% endif %}
+
+<form action="" method="post" enctype="multipart/form-data">
     {% csrf_token %}
-    {{ form.name }}<br>
-    {{ form.description }}<br>
-    {{ form.sex }}<br>
-    {{ form.size }}<br>
-    {{ form.price }}<br>
-    {{ form.image }}<br>  
+    {{ form.as_p }}
 {% comment %}     <input type="text" placeholder="Введдите название товара" class="form-control"><br>
     <textarea placeholder="Введите описание товара" class="form-control"></textarea><br>
     <input type="text" placeholder="Введите пол" class="form-control"><br>

@@ -7,7 +7,7 @@ class catalog(models.Model):
     sex = models.CharField('Пол', max_length=100)
     size = models.CharField('Размер', max_length=6)
     price = models.FloatField()
-    image = models.ImageField(upload_to='images')
+    image = models.ImageField(blank=True, upload_to='static/main/images')
     def __str__(self):
         return self.name
     

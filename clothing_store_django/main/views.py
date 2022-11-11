@@ -1,11 +1,14 @@
+from django.contrib import messages
+from django.contrib.auth import authenticate, login, logout
+from django.contrib.auth.forms import UserCreationForm
+from django.http import HttpResponseRedirect
 from django.shortcuts import redirect, render
 from django.urls import reverse_lazy
 from django.views.generic.edit import CreateView
+
 from .forms import catalogForm
 from .models import catalog
-from django.contrib.auth.forms import UserCreationForm
-from django.contrib.auth import login, logout, authenticate
-from django.contrib import messages
+
 
 # Create your views here.
 def index(request):
@@ -16,19 +19,17 @@ def about(request):
     return render(request, 'main/about.html')
 
 def create(request):
-    error = ''
+    submitted = False
     if request.method == 'POST':
-        form = catalogForm(request.POST)
+        form = catalogForm(request.POST, request.FILES)
         if form.is_valid():
             form.save()
-            return redirect('index')
-        else:
-            error = 'Форма неверна'
-    form = catalogForm()
-    context = {
-        'form': form,
-    }
-    return render(request, 'main/create.html')
+            return HttpResponseRedirect('/create?submitted=True')
+    else:
+        form = catalogForm
+        if 'submitted' in request.GET:
+            submitted = True
+    return render(request, 'main/create.html', {'form': form, 'submitted': submitted})
 
 class RegisterFormView(CreateView):
     form_class = UserCreationForm
