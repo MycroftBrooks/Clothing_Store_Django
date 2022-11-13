@@ -7,16 +7,16 @@ from django.urls import reverse_lazy
 from django.views.generic.edit import CreateView
 
 from .forms import RegisterUserFrom, catalogForm
-from .models import catalog
+from .models import Order, OrderItem, catalog
 
 
 # Create your views here.
 def index(request):
-    catalog_list = catalog.objects.all()
+    context = {"catalog_list": catalog.objects.all()}
     return render(
         request,
         "main/index.html",
-        {"title": "Главная страница", "catalog_list": catalog_list},
+        context,
     )
 
 

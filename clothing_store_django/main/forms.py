@@ -1,20 +1,21 @@
 from django import forms
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.models import User
-from django.forms import ImageField, ModelForm, TextInput
+from django.forms import ImageField, ModelForm, SelectMultiple, TextInput
 
 from .models import catalog
 
 
-class catalogForm(ModelForm):
+class catalogForm(forms.ModelForm):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields["category"].empty_label = "Выберите категорию"
+
     class Meta:
         model = catalog
-        fields = ["name", "description", "sex", "size", "price", "image"]
+        fields = ["name", "category", "sex", "size", "price", "image"]
         labels = {
             "name": "Название товара",
-            "description": "Описание",
-            "sex": "Пол",
-            "size": "Размер",
             "price": "Цена",
             "image": "Изображение",
         }
@@ -24,18 +25,6 @@ class catalogForm(ModelForm):
                     "class": "form-control",
                     "placeholder": "Введдите название товара",
                 }
-            ),
-            "description": TextInput(
-                attrs={
-                    "class": "form-control",
-                    "placeholder": "Введите описание товара",
-                }
-            ),
-            "sex": TextInput(
-                attrs={"class": "form-control", "placeholder": "Введите пол"}
-            ),
-            "size": TextInput(
-                attrs={"class": "form-control", "placeholder": "Введите размер товара"}
             ),
             "price": TextInput(
                 attrs={"class": "form-control", "placeholder": "Введите цену товара"}

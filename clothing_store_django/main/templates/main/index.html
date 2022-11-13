@@ -4,17 +4,49 @@
 {% endblock %}
 
 {% block content%}
-<h1>Каталог товара</h1>
+<center><h1>Каталог товара</h1></center><br>
     {% if catalog_list %}
         {% for product in catalog_list %}
-            <div class="product">
+                    <!--Card-->
+                    <div class="card" style="width: 18rem;">
+
+                        <!--Card image-->
+                        <div class="view overlay">
+                            {% load static %}
+                          <img src="{{product.image}}" class="card-img-top" alt="">
+                          <a>
+                            <div class="mask rgba-white-slight"></div>
+                          </a>
+                        </div>
+                        <!--Card image-->
+          
+                        <!--Card content-->
+                        <div class="card-body text-center">
+                          <!--Category & Title-->
+                          <a href="" class="text-muted" >
+                            <h7>{{ product.get_category_display }}</h7>
+                          </a>
+                          <h4>
+                            <strong>
+                              <a href="" style="color: black;">{{ product.name }}
+                              </a>
+                            </strong>
+                          </h4>
+          
+                          <h6 class="text-muted">
+                            <strong>{{ product.price }} руб.</strong>
+                          </h6>
+          
+                        </div>
+                      </div>
+            {% comment %} <div class="product">
                 <h4>{{ product.name }}</h2>
                 <p>{{ product.description }}</p>
                 <p>{{ product.price }}</p>
                 <p>{{ product.category }}</p>
                 {% load static %}
                 <img src="{{product.image}}">
-            </div>
+            </div> {% endcomment %}
         {% endfor %}
     {% else %}
         <center><p>Товары отсуствуют</p></center>
