@@ -7,10 +7,6 @@ from .models import catalog
 
 
 class catalogForm(forms.ModelForm):
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.fields["category"].empty_label = "Выберите категорию"
-
     class Meta:
         model = catalog
         fields = ["name", "category", "sex", "size", "price", "image"]

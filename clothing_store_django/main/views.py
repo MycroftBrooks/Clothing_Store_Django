@@ -4,24 +4,39 @@ from django.contrib.auth.forms import UserCreationForm
 from django.http import HttpResponseRedirect
 from django.shortcuts import redirect, render
 from django.urls import reverse_lazy
+from django.views.generic import DetailView, ListView
 from django.views.generic.edit import CreateView
 
 from .forms import RegisterUserFrom, catalogForm
 from .models import Order, OrderItem, catalog
 
-
 # Create your views here.
+""" class HomeView(ListView):
+    model = catalog
+    template_name = "main/index.html" """
+
+
 def index(request):
-    context = {"catalog_list": catalog.objects.all()}
+    catalog_list = catalog.objects.all()
     return render(
         request,
         "main/index.html",
-        context,
+        {"title": "Главная страница", "catalog_list": catalog_list},
     )
 
 
 def about(request):
     return render(request, "main/about.html")
+
+
+""" class CatalogDetailView(DetailView):
+    model = catalog
+    template_name = "main/product.html" """
+
+
+def CatalogDetailView(request, pk):
+    product = catalog.objects.get(id=pk)
+    return render(request, "main/product.html", {"product": product})
 
 
 def create(request):

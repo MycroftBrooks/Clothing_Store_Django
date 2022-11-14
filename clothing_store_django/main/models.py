@@ -1,5 +1,6 @@
 from django.conf import settings
 from django.db import models
+from django.urls import reverse
 
 CATEGORY_CHOICES = (
     ("S", "Shirt"),
@@ -26,9 +27,16 @@ class catalog(models.Model):
     size = models.CharField("Размер", choices=SIZE_CHOICES, max_length=3)
     price = models.FloatField()
     image = models.ImageField(blank=True, upload_to="static/main/images")
+    """ slug = models.SlugField() """
 
     def __str__(self):
         return self.name
+
+    def get_absolute_url(self):
+        return reverse("product", kwargs={"pk": self.pk})
+        """ return reverse("main:product", kwargs={
+            'slug': self.slug
+            }) """
 
 
 class OrderItem(models.Model):
