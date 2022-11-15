@@ -27,16 +27,12 @@ class catalog(models.Model):
     size = models.CharField("Размер", choices=SIZE_CHOICES, max_length=3)
     price = models.FloatField()
     image = models.ImageField(blank=True, upload_to="static/main/images")
-    """ slug = models.SlugField() """
 
     def __str__(self):
         return self.name
 
     def get_absolute_url(self):
         return reverse("product", kwargs={"pk": self.pk})
-        """ return reverse("main:product", kwargs={
-            'slug': self.slug
-            }) """
 
     def get_add_to_cart_url(self):
         return reverse("add_to_cart", kwargs={"pk": self.pk})
@@ -54,6 +50,15 @@ class OrderItem(models.Model):
     def __str__(self):
         return f"{self.quantity} of {self.item.name}"
 
+    def get_total_item_price(self):
+        return self.quantity * self.item.price
+
+    def get_final_price(self):
+        return self.get_total_item_price
+
+    def get_quantity(self):
+        return self.quantity
+
 
 class Order(models.Model):
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
@@ -61,6 +66,12 @@ class Order(models.Model):
     start_date = models.DateTimeField(auto_now_add=True)
     ordered_date = models.DateTimeField()
     ordered = models.BooleanField(default=False)
+
+    def get_total(self):
+        total = 0
+        for order_item in self.items.all():
+            total += order_item.get_total_item_price()
+        return total
 
     def __str__(self):
         return self.user.username

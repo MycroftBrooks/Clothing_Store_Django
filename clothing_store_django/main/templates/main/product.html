@@ -4,7 +4,6 @@
 {% endblock %}
 
 {% block content%}
-<!-- Product section-->
 <section class="py-5">
     <div class="container px-4 px-lg-5 my-1">
         <div class="row gx-4 gx-lg-5 align-items-center">
@@ -19,13 +18,8 @@
                 <h4>Пол: <h4><p class="lead">{{product.get_sex_display}}</p>
                 <h4>Размер: <h4><p class="lead">{{product.size}}</p>
                 <div class="d-flex">
-                    {% comment %} <input class="form-control text-center me-3" id="inputQuantity" type="num" value="1" style="max-width: 3rem" />
-                    <button class="btn btn-outline-dark flex-shrink-0" type="button">
-                        <i class="bi-cart-fill me-1"></i>
-                        Add to cart
-                    </button> {% endcomment %}
                     <a href="{{product.get_add_to_cart_url}}" class="btn btn-primary btn-lg me-2" role="button">Добавить в корзину</a>
-                    <a href="{{product.get_remove_from_cart_url}}" class="btn btn-outline-danger btn-lg" role="button">Удалить с корзины</a>
+                    {% comment %} <a href="{{product.get_remove_from_cart_url}}" class="btn btn-outline-danger btn-lg" role="button">Удалить с корзины</a>  {% endcomment %}
                 </div>
             </div>
         </div>

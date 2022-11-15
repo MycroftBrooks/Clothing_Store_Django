@@ -1,11 +1,14 @@
 from django.contrib import messages
 from django.contrib.auth import authenticate, login, logout
+from django.contrib.auth.decorators import login_required
 from django.contrib.auth.forms import UserCreationForm
+from django.contrib.auth.mixins import LoginRequiredMixin
+from django.core.exceptions import ObjectDoesNotExist
 from django.http import HttpResponseRedirect
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse_lazy
 from django.utils import timezone
-from django.views.generic import DetailView, ListView
+from django.views.generic import DetailView, ListView, View
 from django.views.generic.edit import CreateView
 
 from .forms import RegisterUserFrom, catalogForm
@@ -24,6 +27,10 @@ def index(request):
 
 def about(request):
     return render(request, "main/about.html")
+
+
+def faq(request):
+    return render(request, "main/faq.html")
 
 
 def CatalogDetailView(request, pk):
@@ -45,6 +52,7 @@ def create(request):
     return render(request, "main/create.html", {"form": form, "submitted": submitted})
 
 
+@login_required
 def add_to_cart(request, pk):
     item = get_object_or_404(catalog, id=pk)
     order_item, created = OrderItem.objects.get_or_create(
@@ -60,15 +68,16 @@ def add_to_cart(request, pk):
         else:
             order.items.add(order_item)
             messages.info(request, "Товар добавлен в корзину")
-            return redirect("product", pk=pk)
+            return redirect("order_summary")
     else:
         ordered_date = timezone.now()
         order = Order.objects.create(user=request.user, ordered_date=ordered_date)
         order.items.add(order_item)
         messages.info(request, "Товар добавлен в корзину")
-    return redirect("product", pk=pk)
+    return redirect("order_summary")
 
 
+@login_required
 def remove_from_cart(request, pk):
     item = get_object_or_404(catalog, id=pk)
     order_qs = Order.objects.filter(user=request.user, ordered=False)
@@ -80,13 +89,50 @@ def remove_from_cart(request, pk):
             )[0]
             order.items.remove(order_item)
             messages.info(request, "Товар удален из корзины")
-            return redirect("product", pk=pk)
+            return redirect("order_summary")
         else:
             messages.info(request, "Нет этого товара в корзине")
+            return redirect("order_summary", pk=pk)
+    else:
+        messages.info(request, "У вас нет активного заказа")
+        return redirect("order_summary", pk=pk)
+
+
+@login_required
+def remove_single_item_from_cart(request, pk):
+    item = get_object_or_404(catalog, id=pk)
+    order_qs = Order.objects.filter(user=request.user, ordered=False)
+    if order_qs.exists():
+        order = order_qs[0]
+        # check if the order item is in the order
+        if order.items.filter(item__pk=item.pk).exists():
+            order_item = OrderItem.objects.filter(
+                item=item, user=request.user, ordered=False
+            )[0]
+            if order_item.quantity > 1:
+                order_item.quantity -= 1
+                order_item.save()
+            else:
+                order.items.remove(order_item)
+            messages.info(request, "Колличество товара обновлено")
+            return redirect("order_summary")
+        else:
+            messages.info(request, "Товар не в корзине")
             return redirect("product", pk=pk)
     else:
         messages.info(request, "У вас нет активного заказа")
         return redirect("product", pk=pk)
+
+
+class OrderSummaryView(LoginRequiredMixin, View):
+    def get(self, *args, **kwargs):
+        try:
+            order = Order.objects.get(user=self.request.user, ordered=False)
+            context = {"object": order}
+            return render(self.request, "main/order_summary.html", context)
+        except ObjectDoesNotExist:
+            messages.warning(self.request, "У вас нет активного заказа")
+            return redirect("/")
 
 
 # Логика авторизации
@@ -121,6 +167,7 @@ def login_user(request):
         return render(request, "main/login.html")
 
 
+@login_required
 def logout_user(request):
     logout(request)
     messages.success(request, ("Вы вышли из аккаунта"))
