@@ -38,12 +38,21 @@ class catalog(models.Model):
             'slug': self.slug
             }) """
 
+    def get_add_to_cart_url(self):
+        return reverse("add_to_cart", kwargs={"pk": self.pk})
+
+    def get_remove_from_cart_url(self):
+        return reverse("remove_from_cart", kwargs={"pk": self.pk})
+
 
 class OrderItem(models.Model):
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+    ordered = models.BooleanField(default=False)
     item = models.ForeignKey(catalog, on_delete=models.CASCADE)
+    quantity = models.IntegerField("Количество", default=1)
 
     def __str__(self):
-        return self.name
+        return f"{self.quantity} of {self.item.name}"
 
 
 class Order(models.Model):
@@ -54,4 +63,4 @@ class Order(models.Model):
     ordered = models.BooleanField(default=False)
 
     def __str__(self):
-        return self.name
+        return self.user.username

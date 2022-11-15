@@ -2,20 +2,17 @@ from django.contrib import messages
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.forms import UserCreationForm
 from django.http import HttpResponseRedirect
-from django.shortcuts import redirect, render
+from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse_lazy
+from django.utils import timezone
 from django.views.generic import DetailView, ListView
 from django.views.generic.edit import CreateView
 
 from .forms import RegisterUserFrom, catalogForm
 from .models import Order, OrderItem, catalog
 
+
 # Create your views here.
-""" class HomeView(ListView):
-    model = catalog
-    template_name = "main/index.html" """
-
-
 def index(request):
     catalog_list = catalog.objects.all()
     return render(
@@ -27,11 +24,6 @@ def index(request):
 
 def about(request):
     return render(request, "main/about.html")
-
-
-""" class CatalogDetailView(DetailView):
-    model = catalog
-    template_name = "main/product.html" """
 
 
 def CatalogDetailView(request, pk):
@@ -53,6 +45,51 @@ def create(request):
     return render(request, "main/create.html", {"form": form, "submitted": submitted})
 
 
+def add_to_cart(request, pk):
+    item = get_object_or_404(catalog, id=pk)
+    order_item, created = OrderItem.objects.get_or_create(
+        item=item, user=request.user, ordered=False
+    )
+    order_qs = Order.objects.filter(user=request.user, ordered=False)
+    if order_qs.exists():
+        order = order_qs[0]
+        if order.items.filter(item__pk=item.pk).exists():
+            order_item.quantity += 1
+            order_item.save()
+            messages.info(request, "Количество товара обновлено")
+        else:
+            order.items.add(order_item)
+            messages.info(request, "Товар добавлен в корзину")
+            return redirect("product", pk=pk)
+    else:
+        ordered_date = timezone.now()
+        order = Order.objects.create(user=request.user, ordered_date=ordered_date)
+        order.items.add(order_item)
+        messages.info(request, "Товар добавлен в корзину")
+    return redirect("product", pk=pk)
+
+
+def remove_from_cart(request, pk):
+    item = get_object_or_404(catalog, id=pk)
+    order_qs = Order.objects.filter(user=request.user, ordered=False)
+    if order_qs.exists():
+        order = order_qs[0]
+        if order.items.filter(item__pk=item.pk).exists():
+            order_item = OrderItem.objects.filter(
+                item=item, user=request.user, ordered=False
+            )[0]
+            order.items.remove(order_item)
+            messages.info(request, "Товар удален из корзины")
+            return redirect("product", pk=pk)
+        else:
+            messages.info(request, "Нет этого товара в корзине")
+            return redirect("product", pk=pk)
+    else:
+        messages.info(request, "У вас нет активного заказа")
+        return redirect("product", pk=pk)
+
+
+# Логика авторизации
 def register_user(request):
     if request.method == "POST":
         form = RegisterUserFrom(request.POST)

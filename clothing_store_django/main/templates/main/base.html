@@ -1,3 +1,5 @@
+{% load cart_template_tags %}
+
 <!DOCTYPE HTML>
 <html lang="ru">
   <head>
@@ -27,9 +29,18 @@
           </ul>
     
           <div class="col-md-3 text-end">
+            {% if request.user.is_authenticated %} <a href="">
+              <button type="button" class="btn btn-secondary position-relative me-3">
+                Корзина
+                <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
+                  {{ request.user|cart_item_count}}
+                  <span class="visually-hidden">unread messages</span>
+                </span>
+              </button>
+            </a> {% endif %}
             {% if request.user.is_anonymous %}<a href="{% url 'login' %}"><button type="button" class="btn btn-outline-primary me-2">Логин</button></a>{% endif %}
             {% if request.user.is_anonymous %}<a href="{% url 'register' %}"> <button type="button" class="btn btn-primary">Зарегистрироваться</button></a>{% endif %}
-            {% if request.user.is_staff and request.user.is_authenticated%}<a href="{% url 'create' %}"><button type="button" class="btn btn-outline-primary me-2">Создать товар</button></a>{% endif %}
+            {% if request.user.is_staff and request.user.is_authenticated %}<a href="{% url 'create' %}"><button type="button" class="btn btn-outline-primary me-2">Создать товар</button></a>{% endif %}
             {% if request.user.is_authenticated %}<a href="{% url 'logout' %}"><button type="button" class="btn btn-primary">Выйти</button></a>{% endif %}
           </div>
         </header>
