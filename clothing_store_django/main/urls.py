@@ -3,12 +3,15 @@ from django.conf.urls.static import static
 from django.urls import include, path
 
 from . import views
-from .views import OrderSummaryView
+from .views import DeleteProduct, OrderSummaryView
 
 urlpatterns = [
     path("", views.index, name="index"),
+    path("catalog", views.catalogView, name="catalog"),
     path("__reload__/", include("django_browser_reload.urls")),
     path("product/<int:pk>/", views.CatalogDetailView, name="product"),
+    path("DeleteProduct/<product_id>/", views.DeleteProduct, name="delete_product"),
+    path("update_product/<product_id>/", views.update_product, name="update_product"),
     path("add_to_cart/<int:pk>/", views.add_to_cart, name="add_to_cart"),
     path("remove_from_cart/<int:pk>/", views.remove_from_cart, name="remove_from_cart"),
     path(

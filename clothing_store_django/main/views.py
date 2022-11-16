@@ -9,7 +9,7 @@ from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse_lazy
 from django.utils import timezone
 from django.views.generic import DetailView, ListView, View
-from django.views.generic.edit import CreateView
+from django.views.generic.edit import CreateView, DeleteView
 
 from .forms import RegisterUserFrom, catalogForm
 from .models import Order, OrderItem, catalog
@@ -17,11 +17,15 @@ from .models import Order, OrderItem, catalog
 
 # Create your views here.
 def index(request):
+    return render(request, "main/index.html")
+
+
+def catalogView(request):
     catalog_list = catalog.objects.all()
     return render(
         request,
-        "main/index.html",
-        {"title": "Главная страница", "catalog_list": catalog_list},
+        "main/catalog.html",
+        {"catalog_list": catalog_list},
     )
 
 
@@ -50,6 +54,25 @@ def create(request):
         if "submitted" in request.GET:
             submitted = True
     return render(request, "main/create.html", {"form": form, "submitted": submitted})
+
+
+def DeleteProduct(request, product_id):
+    product = catalog.objects.get(pk=product_id)
+    product.delete()
+    messages.info(request, "Товар успешно удален")
+    return redirect("catalog")
+
+
+def update_product(request, product_id):
+    product = catalog.objects.get(pk=product_id)
+    if request.method == "POST":
+        form = catalogForm(request.POST, request.FILES, instance=product)
+        if form.is_valid():
+            form.save()
+            return redirect("catalog")
+    else:
+        form = catalogForm(instance=product)
+    return render(request, "main/update_product.html", {"form": form})
 
 
 @login_required
@@ -171,4 +194,4 @@ def login_user(request):
 def logout_user(request):
     logout(request)
     messages.success(request, ("Вы вышли из аккаунта"))
-    return redirect("index")
+    return redirect("catalog")
